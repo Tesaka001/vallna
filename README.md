@@ -46,12 +46,57 @@ Open [http://localhost:3000](http://localhost:3000).
 Copy `.env.local.example` to `.env.local` and fill in values as each build step
 is reached. Never commit `.env.local`.
 
+## Database (Supabase)
+
+The full data model (§5) lives in [`supabase/migrations`](./supabase/migrations) — 9
+tables, all with Row-Level Security, check constraints, indexes, `updated_at`
+triggers, and a trigger that provisions a `public.users` row on signup.
+
+### One-time setup
+
+1. Create a Supabase project in the **EU — Frankfurt (`eu-central-1`)** region (§7.4).
+2. From the project's **API settings**, copy the URL and keys into `.env.local`:
+   - `NEXT_PUBLIC_SUPABASE_URL`
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+   - `SUPABASE_SERVICE_ROLE_KEY` (server only — never exposed to the client)
+3. Link the CLI and apply the migrations:
+
+```bash
+npm run db:link      # supabase link --project-ref <your-ref>
+npm run db:push      # applies all migrations to the hosted project
+```
+
+Alternatively, paste each file in `supabase/migrations/` (in filename order) into
+the Supabase SQL editor.
+
+### Auth providers
+
+Enable **Email/password** and **Google OAuth** in the Supabase dashboard
+(Authentication → Providers). Wiring into the app happens in Step 3.
+
+### Regenerating types
+
+`src/lib/supabase/types.ts` is hand-authored to match the migrations. After any
+schema change, regenerate from the linked project:
+
+```bash
+npm run db:types
+```
+
+### Client usage
+
+| Import | Use in |
+| --- | --- |
+| `@/lib/supabase/client` | Client Components (anon key, RLS-scoped) |
+| `@/lib/supabase/server` | Server Components / Route Handlers / Actions |
+| `@/lib/supabase/admin` | Trusted server jobs only — bypasses RLS |
+
 ## Build sequence (MVP)
 
 Per the design document, build in order. **Step 1 — Project scaffold** is complete.
 
 1. ✅ Project scaffold — Next.js + Tailwind + Shadcn
-2. Supabase setup (EU / Frankfurt) + tables with RLS
+2. ✅ Supabase setup (EU / Frankfurt) + tables with RLS
 3. Authentication (email/password + Google OAuth)
 4. Onboarding survey + astro profile
 5. Journal
