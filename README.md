@@ -127,6 +127,18 @@ The journal lives at `/journal` with date navigation and multiple entries per da
 
 Entry text is capped at 20,000 characters in application code. New entries default to today in the user's timezone.
 
+## Category tracking
+
+Daily grading lives at `/tracking` — up to 5 categories per user, grades 1–10 with optional notes.
+
+| Route | Methods | Purpose |
+| --- | --- | --- |
+| `/api/categories` | GET, POST | List active categories; create (max 5) |
+| `/api/categories/[id]` | PATCH, DELETE | Edit category; soft-delete (`is_active = false`) |
+| `/api/grades` | GET, POST | List grades for a `date`; submit or update grade for a category |
+
+One grade per category per day is enforced in the API (upsert on POST). Removing a category preserves historical grades.
+
 ## Build sequence (MVP)
 
 Per the design document, build in order. **Step 1 — Project scaffold** is complete.
@@ -136,7 +148,7 @@ Per the design document, build in order. **Step 1 — Project scaffold** is comp
 3. ✅ Authentication (email/password + Google OAuth)
 4. ✅ Onboarding survey + astro profile
 5. ✅ Journal
-6. Category tracking
+6. ✅ Category tracking
 7. LLM layer design (separate design session)
 8. Report generation
 9. Notifications

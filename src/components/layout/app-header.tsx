@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 export function AppHeader({
   active,
 }: {
-  active?: "journal" | "dashboard";
+  active?: "journal" | "tracking" | "dashboard";
 }) {
   return (
     <header className="flex w-full max-w-2xl items-center justify-between gap-4">
@@ -16,13 +16,20 @@ export function AppHeader({
       >
         Vallna
       </Link>
-      <nav className="flex items-center gap-2">
+      <nav className="flex flex-wrap items-center justify-end gap-2">
         <Button
           render={<Link href="/journal" />}
           variant={active === "journal" ? "default" : "ghost"}
           size="sm"
         >
           Journal
+        </Button>
+        <Button
+          render={<Link href="/tracking" />}
+          variant={active === "tracking" ? "default" : "ghost"}
+          size="sm"
+        >
+          Tracking
         </Button>
         <Button
           render={<Link href="/dashboard" />}
