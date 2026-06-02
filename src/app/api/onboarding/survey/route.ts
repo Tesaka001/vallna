@@ -1,10 +1,12 @@
 import { NextResponse } from "next/server";
 
 import { computeAstroProfile } from "@/lib/astro/build-profile";
+import { isLlmConfigured } from "@/lib/llm/client";
 import {
   OnboardingValidationError,
   parseOnboardingPayload,
 } from "@/lib/onboarding/validate";
+import { scoreOnboardingSurvey } from "@/lib/reports/pipeline/onboarding-score";
 import type { Json } from "@/lib/supabase/types";
 import { createClient } from "@/lib/supabase/server";
 
@@ -36,6 +38,8 @@ export async function POST(request: Request) {
 
     const completedAt = new Date().toISOString();
 
+    const profileJson = astro.profile_json as Json;
+
     const { error: profileError } = await supabase
       .from("astro_profiles")
       .upsert(
@@ -53,7 +57,7 @@ export async function POST(request: Request) {
           dreamspell_seal: astro.dreamspell_seal,
           dreamspell_tone: astro.dreamspell_tone,
           dreamspell_wavespell: astro.dreamspell_wavespell,
-          profile_json: astro.profile_json as Json,
+          profile_json: profileJson,
           computed_at: astro.computed_at,
         },
         { onConflict: "user_id" },
@@ -66,13 +70,32 @@ export async function POST(request: Request) {
       );
     }
 
+    let selfPerceptionScore: number | null = null;
+    let surveyResponses: Record<string, unknown> = { ...payload.responses };
+
+    if (isLlmConfigured()) {
+      const score = await scoreOnboardingSurvey({
+        userId: user.id,
+        responses: payload.responses,
+        profileJson,
+      });
+
+      if (score) {
+        selfPerceptionScore = score.self_perception_score;
+        surveyResponses = {
+          ...payload.responses,
+          _alignment_summary: score.alignment_summary,
+          _tension_points: score.tension_points,
+        };
+      }
+    }
+
     const { error: surveyError } = await supabase
       .from("onboarding_surveys")
       .insert({
         user_id: user.id,
-        responses: payload.responses,
-        // LLM scorer (Haiku) runs in Step 8; null until then.
-        self_perception_score: null,
+        responses: surveyResponses as Json,
+        self_perception_score: selfPerceptionScore,
         completed_at: completedAt,
       });
 

@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 export function AppHeader({
   active,
 }: {
-  active?: "journal" | "tracking" | "dashboard";
+  active?: "journal" | "tracking" | "reports" | "dashboard";
 }) {
   return (
     <header className="flex w-full max-w-2xl items-center justify-between gap-4">
@@ -30,6 +30,13 @@ export function AppHeader({
           size="sm"
         >
           Tracking
+        </Button>
+        <Button
+          render={<Link href="/reports" />}
+          variant={active === "reports" ? "default" : "ghost"}
+          size="sm"
+        >
+          Reports
         </Button>
         <Button
           render={<Link href="/dashboard" />}
