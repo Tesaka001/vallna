@@ -226,6 +226,9 @@ export async function generateDailyReport(
       return { status: "failed" };
     }
 
+    const { deliverReport } = await import("@/lib/notifications/deliver-report");
+    await deliverReport(supabase, report.id);
+
     return { status: "generated", reportId: report.id };
   } catch {
     await logUsageCost(supabase, {

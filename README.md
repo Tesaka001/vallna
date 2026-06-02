@@ -172,6 +172,39 @@ curl -X POST http://localhost:3000/api/cron/reports/daily \
 
 Requires journal entries or grades for the user's local date, and `ANTHROPIC_API_KEY` in `.env.local`.
 
+## Notifications
+
+When a daily report is generated, Vallna delivers it according to
+`users.notification_preference` (`email`, `push`, `both`, or `none` / in-app only).
+
+| Route | Methods | Purpose |
+| --- | --- | --- |
+| `/api/users/me` | GET, PATCH | Read or update profile and notification preference |
+| `/api/notifications/push/vapid-key` | GET | Public VAPID key for browser subscription |
+| `/api/notifications/push/subscribe` | POST, DELETE | Register or remove a push subscription |
+
+Settings live at `/settings`. Push uses a service worker at `/sw.js` and stores
+subscriptions in `push_subscriptions`.
+
+### Email (Resend)
+
+Set `RESEND_API_KEY` and optionally `RESEND_FROM_EMAIL` (verified domain in Resend).
+Without Resend, email delivery is skipped; reports remain in the app.
+
+### Push (Web Push)
+
+Generate VAPID keys and add to `.env.local`:
+
+```bash
+npx web-push generate-vapid-keys
+```
+
+Set `NEXT_PUBLIC_VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, and `VAPID_SUBJECT`
+(typically `mailto:you@domain.com`). Users enable push per device from Settings.
+
+Delivery runs automatically after report generation and via the daily cron job
+(`deliverPendingReports` catches any undelivered reports).
+
 ## Build sequence (MVP)
 
 Per the design document, build in order. **Step 1 — Project scaffold** is complete.
@@ -184,7 +217,7 @@ Per the design document, build in order. **Step 1 — Project scaffold** is comp
 6. ✅ Category tracking
 7. ✅ LLM layer design (separate design session)
 8. ✅ Report generation
-9. Notifications
+9. ✅ Notifications
 10. Referral + reviews
 11. GDPR flows
 12. PWA configuration

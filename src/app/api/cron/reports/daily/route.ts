@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 
 import { todayInTimezone } from "@/lib/journal/dates";
 import { isLlmConfigured } from "@/lib/llm/client";
+import { deliverPendingReports } from "@/lib/notifications/deliver-report";
 import { generateDailyReport } from "@/lib/reports/pipeline/daily";
 import { createAdminClient } from "@/lib/supabase/admin";
 
@@ -61,5 +62,7 @@ export async function POST(request: Request) {
     }
   }
 
-  return NextResponse.json({ success: true, results });
+  const delivered = await deliverPendingReports(supabase);
+
+  return NextResponse.json({ success: true, results, delivered });
 }
