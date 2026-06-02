@@ -3,8 +3,6 @@ import { NextResponse, type NextRequest } from "next/server";
 
 import type { Database } from "./types";
 
-// Public routes reachable without an authenticated session. Everything else
-// requires a session (§7.2: all routes verify the Supabase session server-side).
 const PUBLIC_ROUTES = ["/", "/login", "/signup", "/auth", "/error"];
 
 function isPublicRoute(pathname: string): boolean {
@@ -13,9 +11,15 @@ function isPublicRoute(pathname: string): boolean {
   );
 }
 
-// Refreshes the Supabase session cookie on every request and gates protected
-// routes. Must return the response carrying the refreshed cookies so the
-// session stays in sync across Server Components.
+function isOnboardingExempt(pathname: string): boolean {
+  return (
+    pathname === "/onboarding" ||
+    pathname.startsWith("/api/onboarding") ||
+    pathname.startsWith("/auth") ||
+    pathname === "/error"
+  );
+}
+
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
 
@@ -40,8 +44,6 @@ export async function updateSession(request: NextRequest) {
     },
   );
 
-  // IMPORTANT: getUser() revalidates the token with Supabase — do not trust
-  // getSession() in server code. Keep this call immediately after client init.
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -55,7 +57,33 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
+  let onboardingComplete = true;
+
+  if (user) {
+    const { data: appUser } = await supabase
+      .from("users")
+      .select("onboarding_complete")
+      .eq("id", user.id)
+      .single();
+
+    onboardingComplete = appUser?.onboarding_complete ?? false;
+  }
+
   if (user && (pathname === "/login" || pathname === "/signup")) {
+    const url = request.nextUrl.clone();
+    url.pathname = onboardingComplete ? "/dashboard" : "/onboarding";
+    url.search = "";
+    return NextResponse.redirect(url);
+  }
+
+  if (user && !onboardingComplete && !isOnboardingExempt(pathname)) {
+    const url = request.nextUrl.clone();
+    url.pathname = "/onboarding";
+    url.search = "";
+    return NextResponse.redirect(url);
+  }
+
+  if (user && onboardingComplete && pathname === "/onboarding") {
     const url = request.nextUrl.clone();
     url.pathname = "/dashboard";
     url.search = "";

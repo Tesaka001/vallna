@@ -10,10 +10,21 @@ export default async function DashboardPage() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  // Middleware already gates this route; re-check here for defense in depth.
   if (!user) {
     redirect("/login");
   }
+
+  const { data: profile } = await supabase
+    .from("users")
+    .select("display_name, onboarding_complete")
+    .eq("id", user.id)
+    .single();
+
+  if (!profile?.onboarding_complete) {
+    redirect("/onboarding");
+  }
+
+  const greeting = profile.display_name?.trim() || "You";
 
   return (
     <div className="flex flex-1 flex-col items-center justify-center gap-6 bg-background px-6 py-16 text-center">
@@ -21,9 +32,11 @@ export default async function DashboardPage() {
         Vallna
       </span>
       <h1 className="text-3xl font-semibold tracking-tight">
-        You&apos;re signed in.
+        Welcome, {greeting}.
       </h1>
-      <p className="text-muted-foreground">{user.email}</p>
+      <p className="max-w-md text-muted-foreground">
+        Your profile is set. Journal and daily tracking arrive in the next steps.
+      </p>
       <form action={signout}>
         <Button type="submit" variant="outline">
           Sign out

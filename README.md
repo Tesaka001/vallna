@@ -99,6 +99,23 @@ npm run db:types
 | `@/lib/supabase/server` | Server Components / Route Handlers / Actions |
 | `@/lib/supabase/admin` | Trusted server jobs only — bypasses RLS |
 
+## Onboarding
+
+After sign-in, new users complete a multi-step flow at `/onboarding`:
+
+1. Birth data (date required; time and location optional for deeper personalisation)
+2. Three free-form reflection questions (per LLM architecture doc §6.1)
+3. Demographic details (gender, age range, country)
+
+Submitting calls `POST /api/onboarding/survey`, which:
+
+- Computes the Dreamspell galactic signature and western sun/moon/rising signs
+- Writes `astro_profiles.profile_json` (pre-computed for LLM injection)
+- Stores `onboarding_surveys.responses`
+- Sets `users.onboarding_complete = true` and `users.timezone`
+
+`self_perception_score` is left null until the LLM onboarding scorer runs in Step 8.
+
 ## Build sequence (MVP)
 
 Per the design document, build in order. **Step 1 — Project scaffold** is complete.
@@ -106,7 +123,7 @@ Per the design document, build in order. **Step 1 — Project scaffold** is comp
 1. ✅ Project scaffold — Next.js + Tailwind + Shadcn
 2. ✅ Supabase setup (EU / Frankfurt) + tables with RLS
 3. ✅ Authentication (email/password + Google OAuth)
-4. Onboarding survey + astro profile
+4. ✅ Onboarding survey + astro profile
 5. Journal
 6. Category tracking
 7. LLM layer design (separate design session)
