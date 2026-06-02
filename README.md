@@ -116,6 +116,17 @@ Submitting calls `POST /api/onboarding/survey`, which:
 
 `self_perception_score` is left null until the LLM onboarding scorer runs in Step 8.
 
+## Journal
+
+The journal lives at `/journal` with date navigation and multiple entries per day.
+
+| Route | Methods | Purpose |
+| --- | --- | --- |
+| `/api/journal` | GET, POST | List entries by `date` or `from`/`to`; create entry |
+| `/api/journal/[id]` | PATCH, DELETE | Edit or delete own entry |
+
+Entry text is capped at 20,000 characters in application code. New entries default to today in the user's timezone.
+
 ## Build sequence (MVP)
 
 Per the design document, build in order. **Step 1 — Project scaffold** is complete.
@@ -124,7 +135,7 @@ Per the design document, build in order. **Step 1 — Project scaffold** is comp
 2. ✅ Supabase setup (EU / Frankfurt) + tables with RLS
 3. ✅ Authentication (email/password + Google OAuth)
 4. ✅ Onboarding survey + astro profile
-5. Journal
+5. ✅ Journal
 6. Category tracking
 7. LLM layer design (separate design session)
 8. Report generation

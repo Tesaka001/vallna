@@ -165,7 +165,7 @@ export function OnboardingForm() {
         return;
       }
 
-      router.push("/dashboard");
+      router.push("/journal");
       router.refresh();
     } catch {
       setError("Something went wrong. Please try again.");
