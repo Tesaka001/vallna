@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import { Button } from "@/components/ui/button";
 
 export default function Home() {
@@ -18,8 +20,11 @@ export default function Home() {
         </p>
 
         <div className="flex flex-col gap-3 sm:flex-row">
-          <Button size="lg" disabled>
-            Begin — coming soon
+          <Button render={<Link href="/signup" />} size="lg">
+            Begin
+          </Button>
+          <Button render={<Link href="/login" />} size="lg" variant="outline">
+            Sign in
           </Button>
         </div>
 

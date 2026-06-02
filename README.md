@@ -71,8 +71,16 @@ the Supabase SQL editor.
 
 ### Auth providers
 
-Enable **Email/password** and **Google OAuth** in the Supabase dashboard
-(Authentication → Providers). Wiring into the app happens in Step 3.
+In the Supabase dashboard (Authentication → Providers):
+
+1. Enable **Email** (password sign-in).
+2. Enable **Google** and add your OAuth client ID/secret from Google Cloud Console.
+3. Under **URL configuration**, set:
+   - **Site URL:** `http://localhost:3000` (dev) or your Vercel URL (prod)
+   - **Redirect URLs:** `http://localhost:3000/auth/callback`, `http://localhost:3000/auth/confirm`, and the same paths on your production domain
+
+The app uses cookie-based sessions via `@supabase/ssr` (§7.2). Protected routes
+are gated in `src/middleware.ts`; login/signup live at `/login` and `/signup`.
 
 ### Regenerating types
 
@@ -97,7 +105,7 @@ Per the design document, build in order. **Step 1 — Project scaffold** is comp
 
 1. ✅ Project scaffold — Next.js + Tailwind + Shadcn
 2. ✅ Supabase setup (EU / Frankfurt) + tables with RLS
-3. Authentication (email/password + Google OAuth)
+3. ✅ Authentication (email/password + Google OAuth)
 4. Onboarding survey + astro profile
 5. Journal
 6. Category tracking
