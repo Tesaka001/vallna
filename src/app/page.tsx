@@ -29,7 +29,7 @@ export default function Home() {
         </div>
 
         <p className="pt-8 text-xs uppercase tracking-widest text-muted-foreground/70">
-          MVP · Pre-development
+          Installable PWA
         </p>
         <Link
           href="/privacy"

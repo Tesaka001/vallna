@@ -12,6 +12,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import type { NotificationPreference } from "@/lib/supabase/types";
+import {
+  SERVICE_WORKER_PATH,
+  SERVICE_WORKER_SCOPE,
+} from "@/lib/pwa/constants";
 
 const PREFERENCE_OPTIONS: {
   value: NotificationPreference;
@@ -94,7 +98,9 @@ export function NotificationSettings({
 
       setPushConfigured(Boolean(keyData.configured && keyData.publicKey));
 
-      const registration = await navigator.serviceWorker.getRegistration("/sw.js");
+      const registration = await navigator.serviceWorker.getRegistration(
+        SERVICE_WORKER_PATH,
+      );
       if (!registration) {
         setPushSubscribed(false);
         setPushLoading(false);
@@ -167,7 +173,10 @@ export function NotificationSettings({
         return;
       }
 
-      const registration = await navigator.serviceWorker.register("/sw.js");
+      const registration = await navigator.serviceWorker.register(
+        SERVICE_WORKER_PATH,
+        { scope: SERVICE_WORKER_SCOPE },
+      );
       await navigator.serviceWorker.ready;
 
       let subscription = await registration.pushManager.getSubscription();
@@ -207,7 +216,9 @@ export function NotificationSettings({
     setError(null);
 
     try {
-      const registration = await navigator.serviceWorker.getRegistration("/sw.js");
+      const registration = await navigator.serviceWorker.getRegistration(
+        SERVICE_WORKER_PATH,
+      );
       const subscription = await registration?.pushManager.getSubscription();
 
       if (subscription) {

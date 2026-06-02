@@ -238,6 +238,46 @@ via foreign keys.
 The privacy policy lives at `/privacy` (public). It states that journal entries are
 never used to train LLM models and describes EU data residency.
 
+## PWA (Progressive Web App)
+
+Vallna is configured as an installable PWA (design doc Step 12):
+
+| Asset | Location |
+| --- | --- |
+| Web manifest | Auto-generated at `/manifest.webmanifest` from `src/app/manifest.ts` |
+| Service worker | `/sw.js` — offline shell, caching, and push notification handlers |
+| Icons | `/icon-192`, `/icon-512`, favicon, and Apple touch icon |
+| Offline fallback | `/offline` |
+
+The service worker registers in **production** builds only (to avoid cache issues in
+`npm run dev`). Push notifications still register the worker from Settings when
+testing locally.
+
+### Install locally (production mode)
+
+```bash
+npm run build
+npm run start
+```
+
+Open `http://localhost:3000` — Chrome/Edge may show an install prompt, or use
+**Install Vallna** when the banner appears.
+
+### App store submission (PWABuilder)
+
+1. Deploy Vallna to **HTTPS** (e.g. Vercel with your production domain).
+2. Open [PWABuilder](https://www.pwabuilder.com/) and enter your production URL.
+3. Resolve any report items (manifest, service worker, icons should pass).
+4. Generate **Windows**, **Google Play**, and/or **App Store** packages as needed.
+5. After publishing, set store URLs in `.env.local` / Vercel:
+
+```bash
+NEXT_PUBLIC_APP_STORE_URL=https://apps.apple.com/app/idXXXXXXXXX
+NEXT_PUBLIC_PLAY_STORE_URL=https://play.google.com/store/apps/details?id=...
+```
+
+Review buttons on `/referrals` and the dashboard activate once those URLs are set.
+
 ## Build sequence (MVP)
 
 Per the design document, build in order. **Step 1 — Project scaffold** is complete.
@@ -253,4 +293,4 @@ Per the design document, build in order. **Step 1 — Project scaffold** is comp
 9. ✅ Notifications
 10. ✅ Referral + reviews
 11. ✅ GDPR flows
-12. PWA configuration
+12. ✅ PWA configuration

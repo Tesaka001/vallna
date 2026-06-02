@@ -48,7 +48,7 @@ export function ReviewPrompt({
         <p className="text-sm text-muted-foreground">
           {hasLinks
             ? "If Vallna has helped you stay honest with yourself, a short app store review helps others find it."
-            : "When Vallna is listed on the App Store and Google Play (Step 12), a short review helps others find honest growth tools like this one. Store links will appear here once the PWA is published."}
+            : "After Vallna is published to the app stores via PWABuilder, add your store URLs to the environment variables — review buttons will appear here and on the dashboard."}
         </p>
       </div>
 
