@@ -31,6 +31,12 @@ export default function Home() {
         <p className="pt-8 text-xs uppercase tracking-widest text-muted-foreground/70">
           MVP · Pre-development
         </p>
+        <Link
+          href="/privacy"
+          className="text-xs text-muted-foreground underline underline-offset-4"
+        >
+          Privacy policy
+        </Link>
       </main>
     </div>
   );

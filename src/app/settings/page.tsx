@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 
 import { AppHeader } from "@/components/layout/app-header";
+import { AccountPrivacySettings } from "@/components/settings/account-privacy-settings";
 import { NotificationSettings } from "@/components/settings/notification-settings";
 import { createClient } from "@/lib/supabase/server";
 import type { NotificationPreference } from "@/lib/supabase/types";
@@ -33,6 +34,7 @@ export default async function SettingsPage() {
       <div className="flex w-full max-w-2xl flex-col gap-10">
         <AppHeader active="settings" />
         <NotificationSettings initialPreference={preference} />
+        <AccountPrivacySettings />
       </div>
     </div>
   );

@@ -14,6 +14,12 @@ export default function AuthLayout({
         Vallna
       </Link>
       {children}
+      <Link
+        href="/privacy"
+        className="text-xs text-muted-foreground underline underline-offset-4"
+      >
+        Privacy policy
+      </Link>
     </div>
   );
 }

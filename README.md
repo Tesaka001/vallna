@@ -222,6 +222,22 @@ The dashboard shows a dismissible review prompt. Store buttons appear when
 `NEXT_PUBLIC_APP_STORE_URL` and/or `NEXT_PUBLIC_PLAY_STORE_URL` are set (typically
 after Step 12 PWA submission).
 
+## GDPR
+
+Data export and account deletion are available before public launch (design doc §7.4).
+
+| Route | Methods | Purpose |
+| --- | --- | --- |
+| `/api/account/export` | GET | Download all user data as JSON |
+| `/api/account/delete` | DELETE | Permanently delete account and all data |
+
+Settings (`/settings`) includes **Download my data** and **Delete account** (type
+`DELETE` to confirm). Deletion removes the Supabase Auth user; related rows cascade
+via foreign keys.
+
+The privacy policy lives at `/privacy` (public). It states that journal entries are
+never used to train LLM models and describes EU data residency.
+
 ## Build sequence (MVP)
 
 Per the design document, build in order. **Step 1 — Project scaffold** is complete.
@@ -236,5 +252,5 @@ Per the design document, build in order. **Step 1 — Project scaffold** is comp
 8. ✅ Report generation
 9. ✅ Notifications
 10. ✅ Referral + reviews
-11. GDPR flows
+11. ✅ GDPR flows
 12. PWA configuration

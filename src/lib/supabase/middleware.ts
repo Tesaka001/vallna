@@ -9,7 +9,7 @@ import { isValidReferrerId } from "@/lib/referrals/validate";
 
 import type { Database } from "./types";
 
-const PUBLIC_ROUTES = ["/", "/login", "/signup", "/auth", "/error"];
+const PUBLIC_ROUTES = ["/", "/login", "/signup", "/auth", "/error", "/privacy"];
 
 function isPublicRoute(pathname: string): boolean {
   return PUBLIC_ROUTES.some(
