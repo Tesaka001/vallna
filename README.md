@@ -205,6 +205,23 @@ Set `NEXT_PUBLIC_VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, and `VAPID_SUBJECT`
 Delivery runs automatically after report generation and via the daily cron job
 (`deliverPendingReports` catches any undelivered reports).
 
+## Referrals and reviews
+
+Share Vallna at `/referrals`. Each user gets a stable signup link; conversions are
+recorded in the `referrals` table when someone registers through that link.
+
+| Route | Methods | Purpose |
+| --- | --- | --- |
+| `/api/referrals` | GET, POST | Read referral link and history; generate link (idempotent) |
+
+Referral attribution uses a short-lived cookie (`vallna_referrer_id`) set when a
+visitor opens `/signup?ref=<referrer-user-id>`. Conversion is recorded after the
+new user confirms email, completes OAuth, or finishes onboarding.
+
+The dashboard shows a dismissible review prompt. Store buttons appear when
+`NEXT_PUBLIC_APP_STORE_URL` and/or `NEXT_PUBLIC_PLAY_STORE_URL` are set (typically
+after Step 12 PWA submission).
+
 ## Build sequence (MVP)
 
 Per the design document, build in order. **Step 1 — Project scaffold** is complete.
@@ -218,6 +235,6 @@ Per the design document, build in order. **Step 1 — Project scaffold** is comp
 7. ✅ LLM layer design (separate design session)
 8. ✅ Report generation
 9. ✅ Notifications
-10. Referral + reviews
+10. ✅ Referral + reviews
 11. GDPR flows
 12. PWA configuration

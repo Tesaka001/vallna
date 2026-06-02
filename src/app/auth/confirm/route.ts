@@ -1,6 +1,8 @@
 import { type EmailOtpType } from "@supabase/supabase-js";
 import { NextResponse } from "next/server";
 
+import { attributeReferralIfPresent } from "@/lib/referrals/attribute";
+import { REFERRER_COOKIE_NAME } from "@/lib/referrals/constants";
 import { createClient } from "@/lib/supabase/server";
 
 // Email confirmation / magic-link verification. Verifies the OTP token hash and
@@ -19,7 +21,17 @@ export async function GET(request: Request) {
     });
 
     if (!error) {
-      return NextResponse.redirect(`${origin}${next}`);
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (user?.email) {
+        await attributeReferralIfPresent(user.id, user.email);
+      }
+
+      const response = NextResponse.redirect(`${origin}${next}`);
+      response.cookies.delete(REFERRER_COOKIE_NAME);
+      return response;
     }
   }
 

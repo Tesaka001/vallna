@@ -6,6 +6,7 @@ import {
   OnboardingValidationError,
   parseOnboardingPayload,
 } from "@/lib/onboarding/validate";
+import { attributeReferralIfPresent } from "@/lib/referrals/attribute";
 import { scoreOnboardingSurvey } from "@/lib/reports/pipeline/onboarding-score";
 import type { Json } from "@/lib/supabase/types";
 import { createClient } from "@/lib/supabase/server";
@@ -120,6 +121,10 @@ export async function POST(request: Request) {
         { error: "Could not update user profile." },
         { status: 500 },
       );
+    }
+
+    if (user.email) {
+      await attributeReferralIfPresent(user.id, user.email);
     }
 
     return NextResponse.json({ success: true });

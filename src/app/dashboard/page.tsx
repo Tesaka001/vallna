@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { AppHeader } from "@/components/layout/app-header";
+import { DashboardReviewBanner } from "@/components/referrals/dashboard-review-banner";
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/server";
 
@@ -31,6 +32,7 @@ export default async function DashboardPage() {
     <div className="flex flex-1 flex-col items-center bg-background px-6 py-10">
       <div className="flex w-full max-w-2xl flex-col items-center gap-10">
         <AppHeader active="dashboard" />
+        <DashboardReviewBanner />
         <div className="flex flex-col items-center gap-6 py-8 text-center">
           <h1 className="text-3xl font-semibold tracking-tight">
             Welcome, {greeting}.

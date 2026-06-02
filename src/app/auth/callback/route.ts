@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 
+import { attributeReferralIfPresent } from "@/lib/referrals/attribute";
+import { REFERRER_COOKIE_NAME } from "@/lib/referrals/constants";
 import { createClient } from "@/lib/supabase/server";
 
 function safeRedirectTo(value: string | null): string {
@@ -21,16 +23,28 @@ export async function GET(request: Request) {
     const { error } = await supabase.auth.exchangeCodeForSession(code);
 
     if (!error) {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (user?.email) {
+        await attributeReferralIfPresent(user.id, user.email);
+      }
+
       const forwardedHost = request.headers.get("x-forwarded-host");
       const isLocalEnv = process.env.NODE_ENV === "development";
 
+      let response: NextResponse;
       if (isLocalEnv) {
-        return NextResponse.redirect(`${origin}${next}`);
+        response = NextResponse.redirect(`${origin}${next}`);
+      } else if (forwardedHost) {
+        response = NextResponse.redirect(`https://${forwardedHost}${next}`);
+      } else {
+        response = NextResponse.redirect(`${origin}${next}`);
       }
-      if (forwardedHost) {
-        return NextResponse.redirect(`https://${forwardedHost}${next}`);
-      }
-      return NextResponse.redirect(`${origin}${next}`);
+
+      response.cookies.delete(REFERRER_COOKIE_NAME);
+      return response;
     }
   }
 

@@ -1,6 +1,12 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
+import {
+  REFERRER_COOKIE_MAX_AGE,
+  REFERRER_COOKIE_NAME,
+} from "@/lib/referrals/constants";
+import { isValidReferrerId } from "@/lib/referrals/validate";
+
 import type { Database } from "./types";
 
 const PUBLIC_ROUTES = ["/", "/login", "/signup", "/auth", "/error"];
@@ -49,6 +55,20 @@ export async function updateSession(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   const { pathname } = request.nextUrl;
+
+  const refParam = request.nextUrl.searchParams.get("ref");
+  if (
+    refParam &&
+    isValidReferrerId(refParam) &&
+    (pathname === "/signup" || pathname === "/")
+  ) {
+    supabaseResponse.cookies.set(REFERRER_COOKIE_NAME, refParam, {
+      maxAge: REFERRER_COOKIE_MAX_AGE,
+      path: "/",
+      httpOnly: true,
+      sameSite: "lax",
+    });
+  }
 
   if (!user && !isPublicRoute(pathname)) {
     const url = request.nextUrl.clone();

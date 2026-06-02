@@ -16,15 +16,20 @@ import { Label } from "@/components/ui/label";
 export default async function SignupPage({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string; checkEmail?: string }>;
+  searchParams: Promise<{ error?: string; checkEmail?: string; ref?: string }>;
 }) {
-  const { error, checkEmail } = await searchParams;
+  const { error, checkEmail, ref } = await searchParams;
+  const hasReferral = Boolean(ref?.trim());
 
   return (
     <Card className="w-full max-w-sm">
       <CardHeader>
         <CardTitle className="text-2xl">Create your account</CardTitle>
-        <CardDescription>Begin the passage.</CardDescription>
+        <CardDescription>
+          {hasReferral
+            ? "You were invited to begin the passage."
+            : "Begin the passage."}
+        </CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col gap-4">
         {checkEmail ? (
