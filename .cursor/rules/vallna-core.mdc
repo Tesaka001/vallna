@@ -1,0 +1,51 @@
+---
+description: Vallna core build constraints — always apply
+alwaysApply: true
+---
+
+# Vallna — non-negotiable build rules
+
+These are the constraints that apply to every build step. The full reasoning lives in
+`01_vallna_technical_design.md`. Load the relevant section of that doc per task; this
+file is the always-on summary. Brand/strategy context is in `00_vallna_strategy.md`
+(not needed for most steps). The LLM layer is governed by the LLM Architecture & Prompt
+Design doc — load it for Steps 7–8 only.
+
+## Stack (locked — do not substitute without flagging architectural impact)
+- Next.js 14+ (App Router), React, Shadcn/UI, Tailwind CSS.
+- Supabase (PostgreSQL) for DB + Auth. Vercel for hosting. EU region: Frankfurt (eu-central-1 / fra1).
+- Anthropic Claude API, tiered: Haiku (Tier 1) / Sonnet (Tier 2) / Opus (Tier 3).
+- Resend for email. Web Push API for notifications. Stripe is future — schema only, do not build.
+- Target: PWA (no native app).
+
+## Database
+- snake_case for all tables and columns. UUID primary keys. `created_at` + `updated_at` on every table.
+- Row-Level Security (RLS) enabled on EVERY table, from creation. No exceptions, including temp tables.
+- A user can only ever read their own rows. Enforce at the DB layer, not just in app code.
+- Astro/calendar reference content lives in a separate `reference_content` schema, never in user tables.
+
+## Security (highest priority — journal data is deeply sensitive)
+- Never hardcode secrets, API keys, or credentials. Environment variables only. Never commit `.env.local`.
+- Never expose the Supabase service role key to the client. Never use it to bypass RLS in the report pipeline.
+- Never store JWT or sensitive data in localStorage/sessionStorage. Use Supabase cookie-based sessions.
+- Verify the Supabase session server-side (Next.js middleware) on every route that touches user data.
+- LLM system prompt text is server-side only: never returned to the client, never logged.
+- Never log raw journal text, grade notes, onboarding responses, or prompt content in error logs.
+
+## LLM invisibility principle (applies from Step 7 onward)
+- Two personalisation engines (Western astrology + 13-month Dreamspell calendar) are used internally only.
+- Internal terms (Kin, Seal, Tone, Oracle, wavespell, sun/moon/rising sign, house) must NEVER appear in
+  any user-facing output, UI label, or report field. Post-processing must scan report fields before write.
+- Profile JSON uses neutral keys only: `core_drive`, `emotional_pattern`, `archetypal_signature` — never
+  `sun_sign`, `moon_sign`, `galactic_kin`.
+
+## Cost control
+- Never send raw journal text to Tier 2/3. Summarise with Tier 1 (Haiku) first.
+- Never use Opus for daily reports. Match model depth to report type.
+- Every LLM call writes a record to `usage_costs` immediately after the response returns.
+- Pre-compute the astro profile as compact JSON; inject once per prompt; never recompute at call time.
+
+## Workflow
+- Follow the build order in Technical Design §9.2. Do not skip ahead. Each step tested before the next.
+- Feature branches only. `main` is deployable. Never commit directly to `main`.
+- Start a fresh Cursor chat every one to two build steps to keep context clean.

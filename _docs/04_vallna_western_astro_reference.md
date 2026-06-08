@@ -1,36 +1,21 @@
-# VALLNA — Western Astrology Reference Data
-**Version 1.0 | June 2026 | Internal Engine Room Only | Confidential**
-
-> This document is internal reference only. All terminology (sun sign, moon sign, rising, house, aspect) is confined to system prompts and internal code. It never appears in user-facing output.
-
----
-
-## How this document relates to the 13-Month Reference
-
-Both documents feed the same `profile_json` structure stored in `astro_profiles`. The 13-month calendar provides the user's core archetypal pattern. Western astrology provides the psychological and relational layer. Together they produce a richer profile than either system alone.
-
-In LLM prompts, these are never presented as separate systems. They are injected as a single unified **'user personality profile'** block. The model uses both without distinguishing them.
-
-**Layer structure:** Layer 1 = Days 1-30 (daily reports). Layer 2 = Days 31-90 (weekly reports). Layer 3 = Day 91+ (monthly reports, full depth).
-
----
-
-VALLNA — Western Astrology Reference  |  v1.0  |  Confidential
+VALLNA — Western Astrology Reference  |  v1.0.2  |  Confidential
 
 **VALLNA**
 
 Western Astrology — Reference Data
 
-Version 1.0  |  June 2026  |  Internal Engine Room Only  |  Confidential
+Version 1.0.2  |  June 2026  |  Internal Engine Room Only  |  Confidential
+
+*v1.0.2 (June 2026): layer-activation thresholds updated — Layer 2 now unlocks at Day 15 and Layer 3 at Day 30 (previously Day 31 / Day 91), matching the LLM Architecture doc's §11.1. Also repointed the "Used By" reference to the LLM Architecture doc.*
 
 | **Document Status** | **Used By** | **Invisibility Rule** |
 | --- | --- | --- |
-| Internal reference only. Never shown to users. | LLM Architecture v1.1 — Tier 2 and Tier 3 system prompts | All terminology in this document is confined to system prompts and internal code. Sun signs, houses, aspects, and planet names never appear in user-facing report output. |
+| Internal reference only. Never shown to users. | LLM Architecture — Tier 2 and Tier 3 system prompts | All terminology in this document is confined to system prompts and internal code. Sun signs, houses, aspects, and planet names never appear in user-facing report output. |
 
-| HOW THIS DOCUMENT RELATES TO THE 13-MONTH REFERENCE Both documents feed the same profile_json structure stored in astro_profiles. The 13-month calendar provides the user's core archetypal pattern (Seal, Tone, Oracle). Western astrology provides the psychological and relational layer (Sun, Moon, rising, house emphasis, aspects). Together they produce a richer profile than either system alone. In LLM prompts, these are never presented as separate systems. They are injected as a single unified 'user personality profile' block. The model uses both without distinguishing them. Content is layered identically to the 13-month reference: Layer 1: Days 1-30 (concise, actionable). Layer 2: Days 31-90 (deeper inquiry). Layer 3: Day 91+ (full archetypal depth, monthly reports only). |
+| HOW THIS DOCUMENT RELATES TO THE 13-MONTH REFERENCE Both documents feed the same profile_json structure stored in astro_profiles. The 13-month calendar provides the user's core archetypal pattern (Seal, Tone, Oracle). Western astrology provides the psychological and relational layer (Sun, Moon, rising, house emphasis, aspects). Together they produce a richer profile than either system alone. In LLM prompts, these are never presented as separate systems. They are injected as a single unified 'user personality profile' block. The model uses both without distinguishing them. Content is layered identically to the 13-month reference: Layer 1: Days 1-14 (concise, actionable). Layer 2: Days 15-29 (deeper inquiry). Layer 3: Day 30+ (full archetypal depth, monthly reports only). |
 | --- |
 
-# 1. Purpose ** & ** How to Use This Document
+# **1. Purpose ****&**** How to Use This Document**
 
 This document is the canonical western astrology reference for Vallna. It is the source of truth for the western astrology component of astro_profiles.profile_json and for populating the astro_reference schema in Supabase.
 
@@ -46,12 +31,12 @@ It contains:
 
 - LLM injection format for the western astrology component of the profile block
 
-Content is layered intentionally. Layer 1 is used in daily reports — concise and actionable. Layer 2 is deeper, used in weekly reports. Layer 3 is the full psychological and archetypal layer, used only in monthly deep analysis for users on Day 91+.
+Content is layered intentionally. Layer 1 is used in daily reports — concise and actionable. Layer 2 is deeper, used in weekly reports. Layer 3 is the full psychological and archetypal layer, used only in monthly deep analysis for users on Day 30+. NOTE ON ACTIVATION TIMING: The report-type-to-layer mapping above describes which content depth each report type draws on; it is not the activation rule. Actual layer activation is gated by account age, not report type: Layer 2 content unlocks at Day 15 and Layer 3 at Day 30, per LLM Architecture §11.1, which is authoritative on activation timing. A weekly report generated before Day 15 uses Layer 1 content. Where this document and the LLM Architecture document differ on when a layer becomes active, the LLM Architecture document governs.
 
 | BIRTH DATA REQUIREMENTS BY FEATURE Sun sign:          requires birth date only (always available) Moon sign:         requires birth date only (calculated from date; approximate without time) Rising sign:       requires birth date + birth time + birth location (precise) House placements:  requires birth time + location (cannot be calculated without both) Aspects:           calculated from full birth chart (requires time + location for precision) MVP approach: calculate Sun and Moon from birth date alone. Rising and houses are injected as null in profile_json if birth time was not provided. The LLM is instructed to omit house-based insight_lens content when these fields are null. In onboarding UI: birth time is labelled 'optional — improves personalisation'. No further explanation. Do not mention astrology. |
 | --- |
 
-# 2. The 12 Zodiac Signs
+# **2. The 12 Zodiac Signs**
 
 Each sign entry contains: element, modality, traditional ruler, archetype, and three content layers for LLM use. The sign describes the quality of the Sun’s expression at birth — the user’s core drive, identity style, and the way they meet the world. The Moon sign describes emotional need and instinctive response. Both are injected into the profile block with their respective roles.
 
@@ -271,7 +256,7 @@ Layer 3 — Monthly (full archetypal depth)
 
 *Pisces is Neptune’s sign — the water that has become the ocean, that no longer knows where it ends and the rest of the world begins. Mutable water: the most permeable of all the signs, the most capable of taking the shape of its container. The gift is a capacity for compassion and imagination that borders on the transpersonal — the ability to feel what others feel as if it were one’s own, which produces both great artists and exhausted helpers. The wound is the loss of self in the service of others, or in the service of a fantasy that never quite arrives. The medicine is the discovery that boundaries are not the opposite of compassion — they are what makes genuine compassion sustainable.*
 
-# 3. The 10 Planets
+# **3. The 10 Planets**
 
 Each planet entry contains: its domain (what it governs in the psyche), its role in Vallna’s reports, and three content layers. Planets in the user’s birth chart are injected into the profile block by the role they play in the user’s psychological pattern — not by their astrological names. In LLM prompts and user-facing output, they appear as qualities or drives, never as planet names.
 
@@ -457,7 +442,7 @@ Layer 3 — Monthly
 
 *Pluto in the monthly analysis reveals the user’s deepest transformation theme — the domain where life is demanding that they die to one version of themselves in order to become the next. This is never comfortable, and Pluto does not permit shortcuts or delays beyond a certain point. The monthly report can name this theme clearly when the data supports it, trusting the user to meet what is being asked of them.*
 
-# 4. The 12 Houses
+# **4. The 12 Houses**
 
 Houses are used in monthly reports only, and only when the user has provided birth time and location. Without birth time, house placements cannot be calculated accurately and this section of the profile block is null.
 
@@ -679,7 +664,7 @@ Layer 3
 
 *The Twelfth House in the monthly analysis reveals the user’s relationship with their own depths — the self that exists beneath the one they present to the world and to themselves. This is the house most associated with what cannot be seen clearly, which is also what makes it the house of greatest potential for the kind of growth that cannot be engineered, only allowed.*
 
-# 5. Major Aspect Types
+# **5. Major Aspect Types**
 
 Aspects describe the angular relationships between planets in the birth chart — how different psychological drives interact. At MVP, aspects are only available when full chart calculation is used. They are injected into the profile block functionally, not as astrological terminology.
 
@@ -757,11 +742,11 @@ Layer 3
 
 *A square in the monthly analysis is where the user’s most productive difficulty lives. A trine produces ease; a square produces results that matter precisely because they were hard. The user with significant squares often accomplishes more than others because they have no choice but to develop the muscles that others never need. The question the monthly report can ask — when the data supports it — is whether the user is using their friction as fuel, or being consumed by it.*
 
-# 6. LLM Prompt Injection Format
+# **6. LLM Prompt Injection Format**
 
 This section defines how western astrology data is merged into the unified personality profile block in astro_profiles.profile_json. The block combines both the 13-month calendar data (from the companion reference document) and the western astrology data documented here.
 
-## 6.1 Compact profile block (daily/weekly — Layer 1)
+## **6.1 Compact profile block (daily/weekly — Layer 1)**
 
 Stored permanently in astro_profiles.profile_json. Injected into every Tier 2 call.
 
@@ -771,7 +756,7 @@ Stored permanently in astro_profiles.profile_json. Injected into every Tier 2 ca
 | Field naming rule: the key names in the profile JSON block use neutral language only. 'core_drive' not 'sun_sign'. 'emotional_pattern' not 'moon_sign'. 'archetypal_signature' not 'galactic_kin'. The LLM model reads the data through these neutral keys and never has occasion to reproduce the internal terminology in its output. If the model is ever asked what system produced the personalisation, it has no answer — because the system was never named in the prompt. |
 | --- |
 
-## 6.2 Extended profile block (monthly — Layer 3)
+## **6.2 Extended profile block (monthly — Layer 3)**
 
 Assembled at monthly report generation time from reference_content table. Not stored permanently. Adds: Layer 2 + Layer 3 content for Sun and Moon, rising sign and house emphasis if birth time available, dominant aspect dynamics (described functionally), and full 13-month Oracle cross (all five positions).
 
@@ -789,17 +774,17 @@ The extended block adds these fields to the compact block above:
 
 - archetypal_signature extended: analog (supporting quality), antipode (growth edge), guide (directional quality), occult (hidden resource)
 
-# 7. Content Versioning
+# **7. Content Versioning**
 
 Versioning follows the same structure as the 13-month calendar reference:
 
 | **Version** | **Layer Used** | **When Active** | **Content Depth** |
 | --- | --- | --- | --- |
-| v1.0 | Layer 1 only | Days 1–30 | Sun + Moon Layer 1 only. Compact profile block. No rising, no houses. |
-| v1.1 | Layer 1 + Layer 2 | Days 31–90 | Sun + Moon Layers 1 and 2. Directional quality added. Monthly still unavailable. |
-| v1.2 | All three layers | Day 91+ | Full extended block. Rising sign, houses, aspects, full Oracle cross if birth time provided. |
+| v1.0 | Layer 1 only | Days 1–14 | Sun + Moon Layer 1 only. Compact profile block. No rising, no houses. |
+| v1.1 | Layer 1 + Layer 2 | Days 15–29 | Sun + Moon Layers 1 and 2. Directional quality added. Monthly still unavailable. |
+| v1.2 | All three layers | Day 30+ | Full extended block. Rising sign, houses, aspects, full Oracle cross if birth time provided. |
 | v2.0+ | Updated content | When new version published | Content refined based on output quality review. Same activation logic. |
 
-*End of document — Vallna Western Astrology Reference v1.0  |  June 2026*
+*End of document — Vallna Western Astrology Reference v1.0.2  |  June 2026*
 
-vallna_western_astro_reference_v1_0  |  Page
+vallna_western_astro_reference_v1_0_2  |  Page
